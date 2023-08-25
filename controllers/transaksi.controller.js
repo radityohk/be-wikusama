@@ -12,11 +12,19 @@ exports.getAllTransaksi = async (request, response) => {
   transaksiModel.findAll({
     include: [
       {
-      model: mejaModel,
-      required: true, 
+        model: mejaModel,
+        required: true, 
       },
       {
         model: userModel,
+        required: true,
+      },
+      {
+        model: detailModel,
+        as: "detail_transaksi",
+        include: [
+          menuModel
+        ],
         required: true,
       },
   ],
@@ -138,6 +146,7 @@ exports.addTransaksi = async (request, response) => {
     let detailData = {
       id_transaksi: result.id, // ID transaksi yang baru dibuat
       id_menu: request.body.id_menu,
+      qty: request.body.totalQty,
       harga: request.body.totalPrice
       // tambahkan properti detail transaksi lainnya
     };

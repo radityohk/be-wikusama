@@ -15,13 +15,15 @@ module.exports = (sequelize, DataTypes) => {
       })
       // parent: menu, child: detail_transaksi
       this.belongsTo(models.transaksi, {
-        foreignKey: "id_transaksi"
+        foreignKey: "id_transaksi",
+        as: "transaksi"
       })
     }
   }
   detail_transaksi.init({
     id_transaksi: DataTypes.INTEGER,
     id_menu: DataTypes.INTEGER,
+    qty: DataTypes.INTEGER,
     harga: DataTypes.INTEGER,
   }, {
     sequelize,

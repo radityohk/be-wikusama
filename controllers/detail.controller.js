@@ -1,4 +1,5 @@
 const detailModel = require(`../models/index`).detail_transaksi;
+const menuModel = require(`../models/index`).menu;
 const transaksiModel = require(`../models/index`).transaksi;
 const Op = require(`sequelize`).Op;
 const { path } = require(`../models/detail_transaksi`);
