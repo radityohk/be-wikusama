@@ -21,6 +21,9 @@ export default function Pemesanan() {
     const totalPrice = pesanan.reduce((total, item) => {
         return total + (item.harga * item.qty);
     }, 0)
+    const totalQty = pesanan.reduce((qty, item) => {
+        return qty + (item.qty);
+    }, 0)
    const  [id_menu,setIdMenu]=useState("")
     const [meja, setMeja] = useState([]);
     const [selectedMeja, setSelectedMeja] = useState("");
@@ -132,8 +135,10 @@ export default function Pemesanan() {
             nama_pelanggan: namaPelanggan,
             status: "belum bayar",
             total: totalPrice,
+            qty: totalQty,
             detail_transaksi,
             id_menu,
+            totalQty,
             totalPrice
         }
         console.log(data_transaksi);

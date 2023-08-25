@@ -11,7 +11,8 @@ export default function DataTransaksi() {
     const [transaksi, setTransaksi] = useState([])
     const [selectedDate, setSelectedDate] = useState(null);
     const [filteredTransaksi, setFilteredTransaksi] = useState(null);
-
+    const [filterMonthly, setFilterMonthly] = useState(false);
+    const [filteredMonth, setFilteredMonth] = useState(null);
 
     useEffect(() => {
         const fecthDatas = async () => {
@@ -39,29 +40,69 @@ export default function DataTransaksi() {
                 return tgl_transaksi.toDateString() === date.toDateString();
             });
             setFilteredTransaksi(filteredData);
+            setFilterMonthly(false); // Reset filter monthly
         }
     };
 
-    console.log(filteredTransaksi)
+    const filterByMonth = (date) => {
+        if (date) {
+            const filteredData = transaksi.filter((t) => {
+                const tgl_transaksi = new Date(t.tgl_transaksi);
+                const selectedMonth = new Date(date);
+                return tgl_transaksi.getMonth() === selectedMonth.getMonth() &&
+                    tgl_transaksi.getFullYear() === selectedMonth.getFullYear();
+            });
+            setFilteredTransaksi(filteredData);
+            setFilterMonthly(true); // Set filter monthly active
+            setFilteredMonth(date); // Save filtered month
+        }
+    };
+
     return (
         <div>
             <div className="mt-5 mx-5 flex">
                 <div className="flex p-2 bg-gray-100 rounded-md border shadow-sm">
-                    <span className="flex-none">Tgl. Transaksi : </span>
-                    <DatePicker className="pl-1 bg-gray-100" selected={selectedDate} onChange={(date) => {
-                        setSelectedDate(date);
-                        filterByDate(date);
-                    }} />
+                    <span className="flex-none">Filter By  : </span>
+                    <select className="pl-1 bg-gray-100" value={filterMonthly ? "monthly" : "daily"} onChange={(e) => {
+                        if (e.target.value === "monthly") {
+                            setSelectedDate(null); // Reset daily filter
+                            setFilterMonthly(true);
+                        } else {
+                            setFilterMonthly(false);
+                        }
+                    }}>
+                        <option value="daily">Harian</option>
+                        <option value="monthly">Bulanan</option>
+                    </select>
+                    {filterMonthly ? (
+                        <DatePicker
+                            className="pl-1 bg-gray-100"
+                            showMonthYearPicker
+                            selected={filteredMonth}
+                            onChange={(date) => {
+                                setSelectedDate(date);
+                                filterByMonth(date);
+                            }}
+                        />
+                    ) : (
+                        <DatePicker
+                            className="pl-1 bg-gray-100"
+                            selected={selectedDate}
+                            onChange={(date) => {
+                                setSelectedDate(date);
+                                filterByDate(date);
+                            }}
+                        />
+                    )}
                 </div>
             </div>
-
             <div className="overflow-hidden rounded-lg border border-gray-200 shadow-md m-5">
                 <table className="w-full border-collapse bg-white text-left text-sm text-gray-500">
                     <thead className="bg-gray-50">
                         <tr>
                             <th scope="col" className="px-6 py-4 font-medium text-gray-900">Nama Kasir</th>
                             <th scope="col" className="px-6 py-4 font-medium text-gray-900">Tanggal Transaksi</th>
-
+                            <th scope="col" className="px-6 py-4 font-medium text-gray-900">Jumlah</th>
                             <th scope="col" className="px-6 py-4 font-medium text-gray-900">Total Harga</th>
                             <th scope="col" className="px-6 py-4 font-medium text-gray-900">Status</th>
                         </tr>
@@ -73,6 +114,7 @@ export default function DataTransaksi() {
                                     <tr key={transaksi.id} className="hover:bg-gray-50">
                                         <td className="px-6 py-4">{transaksi.user.nama_user}</td>
                                         <td className="px-6 py-4">{dateFormat(transaksi.tgl_transaksi)}</td>
+                                        <td className="px-6 py-4">{transaksi.detail_transaksi[0].qty}</td>
                                         <td className="px-6 py-4">{transaksi.total}</td>
                                         <td className="px-6 py-4">
                                             <div className="flex gap-2">
@@ -90,6 +132,7 @@ export default function DataTransaksi() {
                                     <tr key={transaksi.id_transaksi} className="hover:bg-gray-50">
                                         <td className="px-6 py-4">{transaksi.user.nama_user}</td>
                                         <td className="px-6 py-4">{dateFormat(transaksi.tgl_transaksi)}</td>
+                                        <td className="px-6 py-4">{transaksi.detail_transaksi.qty}</td>
                                         <td className="px-6 py-4">{transaksi.total}</td>
                                         <td className="px-6 py-4">
                                             <div className="flex gap-2">

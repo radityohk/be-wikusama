@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { PrintBill } from "./PrintBill";
 
 export default function Riwayat() {
   const headers = {
@@ -98,14 +99,20 @@ export default function Riwayat() {
 
   return (
     <div>
-      <div>
+      <div className="flex p-2 ml-5 bg-gray-100 rounded-md border shadow-sm">
         <input
           type="text"
           value={keyword}
+          className="pl-1 bg-gray-100"
           onChange={(e) => setKeyword(e.target.value)}
           placeholder="Search keyword"
         />
-        <button onClick={handleSearch}>Search</button>
+        <button
+          className="ml-2 bg-cyan-100 p-1 rounded-md"
+          onClick={handleSearch}
+        >
+          Search
+        </button>
       </div>
       <div className="overflow-hidden rounded-lg border border-gray-200 shadow-md m-5">
         <table className="w-full border-collapse bg-white text-left text-sm text-gray-500">
@@ -122,6 +129,9 @@ export default function Riwayat() {
               </th>
               <th scope="col" className="px-6 py-4 font-medium text-gray-900">
                 Status
+              </th>
+              <th scope="col" className="px-6 py-4 font-medium text-gray-900">
+                Cetak Nota
               </th>
               {/* <th scope="col" className="px-6 py-4 font-medium text-gray-900"></th> */}
             </tr>
