@@ -41,6 +41,42 @@ exports.getAllTransaksi = async (request, response) => {
     })
 };
 
+exports.getTransaksibyID = async (request, response) => {
+  const keyword = request.params.id;
+
+  let transaksi = await transaksiModel.findAll({
+    where: {
+      [Op.or]: [
+        { id_user: { [Op.substring]: keyword } },
+      ],
+    },
+    include: [
+      {
+        model: mejaModel,
+        required: true, 
+      },
+      {
+        model: userModel,
+        required: true,
+      },
+      {
+        model: detailModel,
+        as: "detail_transaksi",
+        include: [
+          menuModel
+        ],
+        required: true,
+      },
+  ],
+  })
+  return response.json({
+    success: true,
+    data: transaksi,
+    message: `All transaksi have been loaded`,
+  });
+    };
+  
+    
 exports.findTransaksi = async (request, response) => {
   let keyword = request.body.keyword;
 
