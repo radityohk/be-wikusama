@@ -6,39 +6,38 @@ const menuModel = require(`../models/index`).menu;
 const Op = require(`sequelize`).Op;
 const md5 = require(`md5`);
 const mysql = require(`mysql2`);
-const moment = require('moment')
+const moment = require("moment");
 
 exports.getAllTransaksi = async (request, response) => {
-  transaksiModel.findAll({
-    include: [
-      {
-        model: mejaModel,
-        required: true, 
-      },
-      {
-        model: userModel,
-        required: true,
-      },
-      {
-        model: detailModel,
-        as: "detail_transaksi",
-        include: [
-          menuModel
-        ],
-        required: true,
-      },
-  ],
-  })
-    .then(result => {
-        response.json({
-            data: result
-        })
+  transaksiModel
+    .findAll({
+      include: [
+        {
+          model: mejaModel,
+          required: true,
+        },
+        {
+          model: userModel,
+          required: true,
+        },
+        {
+          model: detailModel,
+          as: "detail_transaksi",
+          include: [menuModel],
+          required: true,
+        },
+      ],
     })
-    .catch(error => {
-        response.json({
-            message: error.message
-        })
+    .then((result) => {
+      response.json({
+        data: result,
+      });
     })
+    .catch((error) => {
+      response.json({
+        message: error.message,
+      });
+    });
 };
 
 exports.getTransaksibyID = async (request, response) => {
@@ -46,14 +45,12 @@ exports.getTransaksibyID = async (request, response) => {
 
   let transaksi = await transaksiModel.findAll({
     where: {
-      [Op.or]: [
-        { id_user: { [Op.substring]: keyword } },
-      ],
+      [Op.or]: [{ id_user: { [Op.substring]: keyword } }],
     },
     include: [
       {
         model: mejaModel,
-        required: true, 
+        required: true,
       },
       {
         model: userModel,
@@ -62,21 +59,53 @@ exports.getTransaksibyID = async (request, response) => {
       {
         model: detailModel,
         as: "detail_transaksi",
-        include: [
-          menuModel
-        ],
+        include: [menuModel],
         required: true,
       },
-  ],
-  })
+    ],
+  });
   return response.json({
     success: true,
     data: transaksi,
     message: `All transaksi have been loaded`,
   });
-    };
-  
-    
+};
+
+exports.getTransaksibyDate = async (request, response) => {
+  const dateString = request.params.date; // Mengambil tanggal dalam format "dd/mm/yyyy"
+
+  // Mengubah tanggal dari format "dd/mm/yyyy" menjadi format "yyyy-mm-dd"
+  const [day, month, year] = dateString.split("/");
+  const formattedDate = `${day}-${month}-${year}`;
+
+  let transaksi = await transaksiModel.findAll({
+    where: {
+      tgl_transaksi: formattedDate, // Menggunakan tanggal yang sudah diformat
+    },
+    include: [
+      {
+        model: mejaModel,
+        required: true,
+      },
+      {
+        model: userModel,
+        required: true,
+      },
+      {
+        model: detailModel,
+        as: "detail_transaksi",
+        include: [menuModel],
+        required: true,
+      },
+    ],
+  });
+  return response.json({
+    success: true,
+    data: transaksi,
+    message: `All transaksi have been loaded`,
+  });
+};
+
 exports.findTransaksi = async (request, response) => {
   let keyword = request.body.keyword;
 
@@ -156,16 +185,15 @@ exports.findTransaksibyName = async (request, response) => {
 // };
 
 exports.addTransaksi = async (request, response) => {
-  let { tgl_transaksi, id_user, id_meja, nama_pelanggan, status } = request.body;
+  let { tgl_transaksi, id_user, id_meja, nama_pelanggan, status } =
+    request.body;
 
   let check = await transaksiModel.findOne({
     where: {
       id_meja: id_meja,
-      tgl_transaksi: tgl_transaksi
-    }
+      tgl_transaksi: tgl_transaksi,
+    },
   });
-
- 
 
   let data = {
     tgl_transaksi: request.body.tgl_transaksi,
@@ -173,42 +201,43 @@ exports.addTransaksi = async (request, response) => {
     id_meja: request.body.id_meja,
     nama_pelanggan: request.body.nama_pelanggan,
     total: request.body.total,
-    status: request.body.status
+    status: request.body.status,
   };
 
-  transaksiModel.create(data)
-  .then(result => {
-    // Simpan data detail transaksi
-    let detailData = {
-      id_transaksi: result.id, // ID transaksi yang baru dibuat
-      id_menu: request.body.id_menu,
-      qty: request.body.totalQty,
-      harga: request.body.totalPrice
-      // tambahkan properti detail transaksi lainnya
-    };
-console.log(detailData);
-    detailModel.create(detailData)
-      .then(detailResult => {
-        response.json({
-          message: "Data Berhasil Ditambahkan",
-          data: {
-            transaksi: result,
-            detailTransaksi: detailResult
-          }
+  transaksiModel
+    .create(data)
+    .then((result) => {
+      // Simpan data detail transaksi
+      let detailData = {
+        id_transaksi: result.id, // ID transaksi yang baru dibuat
+        id_menu: request.body.id_menu,
+        qty: request.body.totalQty,
+        harga: request.body.totalPrice,
+        // tambahkan properti detail transaksi lainnya
+      };
+      console.log(detailData);
+      detailModel
+        .create(detailData)
+        .then((detailResult) => {
+          response.json({
+            message: "Data Berhasil Ditambahkan",
+            data: {
+              transaksi: result,
+              detailTransaksi: detailResult,
+            },
+          });
+        })
+        .catch((error) => {
+          response.json({
+            message: error.message,
+          });
         });
-      })
-      .catch(error => {
-        response.json({
-          message: error.message
-        });
+    })
+    .catch((error) => {
+      response.json({
+        message: error.message,
       });
-  })
-  .catch(error => {
-    response.json({
-      message: error.message
     });
-  });
-
 };
 
 exports.updateTransaksi = (request, response) => {
@@ -217,25 +246,24 @@ exports.updateTransaksi = (request, response) => {
     id_user: request.body.id_user,
     id_meja: request.body.id_meja,
     nama_pelanggan: request.body.nama_pelanggan,
-    status: request.body.status
+    status: request.body.status,
+  };
 
-  }
+  let id_transaksi = request.params.id;
 
-    let id_transaksi = request.params.id;
-
-
-    transaksiModel.update(data, { where: { id: id_transaksi } })
-    .then(result => {
-        response.json ({
-            success: true,
-            message: "Data Berhasil Diganti",
-        })
+  transaksiModel
+    .update(data, { where: { id: id_transaksi } })
+    .then((result) => {
+      response.json({
+        success: true,
+        message: "Data Berhasil Diganti",
+      });
     })
-    .catch(error => {
-        response.json({
-            message: error.message
-        })
-    })
+    .catch((error) => {
+      response.json({
+        message: error.message,
+      });
+    });
 };
 
 exports.deleteTransaksi = (request, response) => {
@@ -260,10 +288,10 @@ exports.deleteTransaksi = (request, response) => {
 exports.checkTransaksi = async (request, response) => {
   const { id_meja, tgl_transaksi } = request.query;
 
-  if (id_meja === '' && tgl_transaksi === '') {
+  if (id_meja === "" && tgl_transaksi === "") {
     return res.status(400).json({
-      status: 'error',
-      message: 'Meja telah digunakan pada tanggal yang sama'
+      status: "error",
+      message: "Meja telah digunakan pada tanggal yang sama",
     });
   }
-}
+};

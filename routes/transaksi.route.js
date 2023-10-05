@@ -6,6 +6,7 @@ const { auth } = require(`../auth/auth`);
 
 app.get("/", auth, userController.getAllTransaksi);
 app.get("/:id", auth, userController.getTransaksibyID);
+app.get("/:date", auth, userController.getTransaksibyDate);
 app.post("/add", auth, userController.addTransaksi);
 app.post("/find", auth, userController.findTransaksi);
 app.post("/findby", auth, userController.findTransaksibyName);
