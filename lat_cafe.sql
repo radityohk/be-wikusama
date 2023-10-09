@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 24, 2023 at 02:15 AM
+-- Generation Time: Oct 06, 2023 at 12:29 AM
 -- Server version: 10.4.24-MariaDB
 -- PHP Version: 8.1.6
 
@@ -31,10 +31,21 @@ CREATE TABLE `detail_transaksis` (
   `id` int(11) NOT NULL,
   `id_transaksi` int(11) NOT NULL,
   `id_menu` int(11) NOT NULL,
+  `qty` int(11) NOT NULL,
   `harga` int(11) NOT NULL,
   `createdAt` datetime NOT NULL,
   `updatedAt` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `detail_transaksis`
+--
+
+INSERT INTO `detail_transaksis` (`id`, `id_transaksi`, `id_menu`, `qty`, `harga`, `createdAt`, `updatedAt`) VALUES
+(17, 8, 1, 4, 50000, '2023-08-02 04:31:12', '2023-08-02 04:31:12'),
+(18, 9, 4, 2, 25000, '2023-09-08 03:26:23', '2023-09-08 03:26:23'),
+(19, 10, 4, 2, 25000, '2023-10-03 01:50:25', '2023-10-03 01:50:25'),
+(20, 11, 4, 2, 25000, '2023-10-03 01:51:21', '2023-10-03 01:51:21');
 
 -- --------------------------------------------------------
 
@@ -55,8 +66,8 @@ CREATE TABLE `mejas` (
 --
 
 INSERT INTO `mejas` (`id`, `nomor_meja`, `status`, `createdAt`, `updatedAt`) VALUES
-(1, '25', 'tidak tersedia', '2023-03-30 15:22:43', '2023-05-23 04:14:24'),
-(2, '15', 'tidak tersedia', '2023-03-30 15:24:46', '2023-05-23 04:10:37'),
+(1, '25', 'tersedia', '2023-03-30 15:22:43', '2023-10-03 01:50:46'),
+(2, '15', 'tidak tersedia', '2023-03-30 15:24:46', '2023-10-03 01:51:21'),
 (3, '5', 'tersedia', '2023-05-24 00:08:41', '2023-05-24 00:08:41');
 
 -- --------------------------------------------------------
@@ -123,6 +134,16 @@ CREATE TABLE `transaksis` (
   `updatedAt` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+--
+-- Dumping data for table `transaksis`
+--
+
+INSERT INTO `transaksis` (`id`, `tgl_transaksi`, `id_user`, `id_meja`, `nama_pelanggan`, `total`, `status`, `createdAt`, `updatedAt`) VALUES
+(8, '2023-08-01 17:00:00', 2, 1, 'Hari', 50000, 'lunas', '2023-08-02 04:31:12', '2023-08-02 04:31:15'),
+(9, '2023-09-07 17:00:00', 2, 1, 'Ahrasya', 25000, 'lunas', '2023-09-08 03:26:23', '2023-09-08 03:26:34'),
+(10, '2023-10-02 17:00:00', 2, 1, 'Alam', 25000, 'lunas', '2023-10-03 01:50:25', '2023-10-03 01:50:46'),
+(11, '2023-10-02 17:00:00', 5, 2, 'Juhdi', 25000, 'belum bayar', '2023-10-03 01:51:21', '2023-10-03 01:51:21');
+
 -- --------------------------------------------------------
 
 --
@@ -146,7 +167,8 @@ CREATE TABLE `users` (
 INSERT INTO `users` (`id`, `nama_user`, `role`, `username`, `password`, `createdAt`, `updatedAt`) VALUES
 (1, 'Jarot Gemink', 'admin', 'jarbi', '202cb962ac59075b964b07152d234b70', '2023-03-30 15:22:10', '2023-05-19 16:37:03'),
 (2, 'Budi', 'kasir', 'budi', '202cb962ac59075b964b07152d234b70', '2023-05-16 05:56:09', '2023-05-23 00:43:53'),
-(4, 'Sumi', 'manajer', 'sumi', '202cb962ac59075b964b07152d234b70', '2023-05-19 16:39:05', '2023-05-19 16:42:36');
+(4, 'Sumi', 'manajer', 'sumi', '202cb962ac59075b964b07152d234b70', '2023-05-19 16:39:05', '2023-05-19 16:42:36'),
+(5, 'Ahmad', 'kasir', 'ahmad', '202cb962ac59075b964b07152d234b70', '2023-09-08 06:02:21', '2023-09-08 06:02:21');
 
 --
 -- Indexes for dumped tables
@@ -201,7 +223,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `detail_transaksis`
 --
 ALTER TABLE `detail_transaksis`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT for table `mejas`
@@ -213,19 +235,19 @@ ALTER TABLE `mejas`
 -- AUTO_INCREMENT for table `menus`
 --
 ALTER TABLE `menus`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `transaksis`
 --
 ALTER TABLE `transaksis`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- Constraints for dumped tables

@@ -63,6 +63,53 @@ exports.addDetail = async (request, response) => {
 })
 };
 
+exports.statistikTransaksi = (request, response) => {
+  const menuTotals = new Map();
+
+  detailModel
+    .findAll()
+    .then((details) => {
+      // Fetch menu details
+      menuModel.findAll().then((menus) => {
+        // Iterate over each detail
+        details.forEach((detail) => {
+          const menuId = detail.id_menu;
+
+          // Find the corresponding menu for the current detail
+          const menu = menus.find((m) => m.id === menuId);
+
+          if (menu) {
+            const menuName = menu.nama_menu;
+            const total = detail.qty;
+
+            // Update or initialize total for the menu item in the hash map
+            if (menuTotals.has(menuName)) {
+              menuTotals.set(menuName, menuTotals.get(menuName) + total);
+            } else {
+              menuTotals.set(menuName, total);
+            }
+          }
+        });
+
+        // Convert hash map to array of objects
+        const result = Array.from(menuTotals, ([menuName, total]) => ({
+          nama_menu: menuName,
+          total_pembelian: total,
+        }));
+
+        return response.json({
+          data: result,
+        });
+      });
+    })
+    .catch((error) => {
+      response.json({
+        message: error.message,
+      });
+    });
+};
+
+
 exports.updateDetail = (request, response) => {
   let data = {
     id_transaksi: request.body.id_transaksi,

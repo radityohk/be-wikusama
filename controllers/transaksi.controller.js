@@ -127,24 +127,6 @@ exports.findTransaksi = async (request, response) => {
   });
 };
 
-exports.findTransaksibyName = async (request, response) => {
-  let keyword = request.body.keyword;
-
-  let transaksi = await transaksiModel.findAll({
-    where: {
-      [Op.or]: [
-        { nama_pelanggan: { [Op.substring]: keyword } },
-        { status: { [Op.substring]: keyword } },
-      ],
-    },
-  });
-  return response.json({
-    success: true,
-    data: transaksi,
-    message: `All transaksi have been loaded`,
-  });
-};
-
 // exports.addTransaksi = async (request, response) => {
 //   const cekMeja = await transaksiModel.findOne({
 //    where: {
@@ -184,60 +166,100 @@ exports.findTransaksibyName = async (request, response) => {
 //     })
 // };
 
+// exports.addTransaksi = async (request, response) => {
+//   let { tgl_transaksi, id_user, id_meja, nama_pelanggan, status } =
+//     request.body;
+
+//   let check = await transaksiModel.findOne({
+//     where: {
+//       id_meja: id_meja,
+//       tgl_transaksi: tgl_transaksi,
+//     },
+//   });
+
+//   let data = {
+//     tgl_transaksi: request.body.tgl_transaksi,
+//     id_user: request.body.id_user,
+//     id_meja: request.body.id_meja,
+//     nama_pelanggan: request.body.nama_pelanggan,
+//     total: request.body.total,
+//     status: request.body.status,
+//   };
+
+//   transaksiModel
+//     .create(data)
+//     .then((result) => {
+//       // Simpan data detail transaksi
+//       let detailData = {
+//         id_transaksi: result.id, // ID transaksi yang baru dibuat
+//         id_menu: request.body.id_menu,
+//         qty: request.body.totalQty,
+//         harga: request.body.totalPrice,
+//         // tambahkan properti detail transaksi lainnya
+//       };
+//       console.log(detailData);
+//       detailModel
+//         .create(detailData)
+//         .then((detailResult) => {
+//           response.json({
+//             message: "Data Berhasil Ditambahkan",
+//             data: {
+//               transaksi: result,
+//               detailTransaksi: detailResult,
+//             },
+//           });
+//         })
+//         .catch((error) => {
+//           response.json({
+//             message: error.message,
+//           });
+//         });
+//     })
+//     .catch((error) => {
+//       response.json({
+//         message: error.message,
+//       });
+//     });
+// };
+
 exports.addTransaksi = async (request, response) => {
-  let { tgl_transaksi, id_user, id_meja, nama_pelanggan, status } =
-    request.body;
+  try {
+    let data = {
+      tgl_transaksi: request.body.tgl_transaksi,
+      id_user: request.body.id_user,
+      id_meja: request.body.id_meja,
+      nama_pelanggan: request.body.nama_pelanggan,
+      total: request.body.total,
+      status: request.body.status,
+    };
 
-  let check = await transaksiModel.findOne({
-    where: {
-      id_meja: id_meja,
-      tgl_transaksi: tgl_transaksi,
-    },
-  });
+    let result = await transaksiModel.create(data);
 
-  let data = {
-    tgl_transaksi: request.body.tgl_transaksi,
-    id_user: request.body.id_user,
-    id_meja: request.body.id_meja,
-    nama_pelanggan: request.body.nama_pelanggan,
-    total: request.body.total,
-    status: request.body.status,
-  };
-
-  transaksiModel
-    .create(data)
-    .then((result) => {
-      // Simpan data detail transaksi
-      let detailData = {
-        id_transaksi: result.id, // ID transaksi yang baru dibuat
-        id_menu: request.body.id_menu,
-        qty: request.body.totalQty,
-        harga: request.body.totalPrice,
-        // tambahkan properti detail transaksi lainnya
+    // Prepare an array to store details data
+    let detailsData = request.body.detail_transaksi.map((detail) => {
+      return {
+        id_transaksi: result.id,
+        id_menu: detail.id_menu,
+        qty: detail.qty,
+        harga: detail.subtotal,
       };
-      console.log(detailData);
-      detailModel
-        .create(detailData)
-        .then((detailResult) => {
-          response.json({
-            message: "Data Berhasil Ditambahkan",
-            data: {
-              transaksi: result,
-              detailTransaksi: detailResult,
-            },
-          });
-        })
-        .catch((error) => {
-          response.json({
-            message: error.message,
-          });
-        });
-    })
-    .catch((error) => {
-      response.json({
-        message: error.message,
-      });
     });
+
+    // Bulk create the details data
+    let detailResults = await detailModel.bulkCreate(detailsData);
+
+    response.json({
+      message: "Data Berhasil Ditambahkan",
+      data: {
+        transaksi: result,
+        detailTransaksi: detailResults,
+      },
+    });
+  } catch (error) {
+    response.json({
+      message: error.message,
+    });
+  }
 };
 
 exports.updateTransaksi = (request, response) => {

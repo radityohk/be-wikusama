@@ -9,7 +9,6 @@ app.get("/:id", auth, userController.getTransaksibyID);
 app.get("/:date", auth, userController.getTransaksibyDate);
 app.post("/add", auth, userController.addTransaksi);
 app.post("/find", auth, userController.findTransaksi);
-app.post("/findby", auth, userController.findTransaksibyName);
 app.get("/check", auth, userController.checkTransaksi);
 app.put("/:id", auth, userController.updateTransaksi);
 app.delete("/:id", auth, userController.deleteTransaksi);
